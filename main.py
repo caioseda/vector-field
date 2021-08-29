@@ -2,6 +2,8 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
 import numpy as np
+from vector import Vector
+from vectorField import VectorField
 
 N_PONTOS = 20
 WIDTH = 1080
@@ -11,85 +13,25 @@ CELL_SIZE = 20
 z = -2
 angulo_rot = 0
 
-class Vector():
-    def __init__(self, x, y, angle=0, size=1, default_vector=None):
-        if default_vector:
-            self.v = default_vector 
-        else:
-            self.v = np.array([1,0])
-        
-        self.position = np.array([x,y])
-        self.angle = angle
-        self.size = size
 
-        self.default_vector = default_vector
-    
-    def draw_vector(self, head_angle=90):        
-        glBegin(GL_LINES)
-        glVertex3f(0,0,0)
-        glVertex3f(self.v[0], self.v[1],0)
-        glEnd()
-
-        scale_x = self.v[0]*0.85
-        scale_y = self.v[1]*0.85
-        m = -1/(self.v[0]/self.v[1])
-        
-        arrow_head_x1 = scale_x
-        arrow_head_y1 = m * scale_x
-
-        # arrow_head_x1 = np.cos(head_angle * scale_x)  - np.sin(head_angle * scale_y) 
-        # arrow_head_y1 = np.sin(head_angle * scale_x)  + np.cos(head_angle * scale_y)
-        
-        # arrow_head_x2 = np.cos(-head_angle) * scale_x - np.sin(-head_angle) * scale_y
-        # arrow_head_y2 = np.sin(-head_angle) * scale_x - np.cos(-head_angle) * scale_y
-
-        glBegin(GL_POINTS)
-        glVertex3f(self.v[0],self.v[1],0)
-        glVertex3f(arrow_head_x1, arrow_head_y1,  0)
-        glVertex3f(-arrow_head_x1, -arrow_head_y1,  0)
-        glEnd()
-    
-    def draw(self):
-        glPushMatrix()
-        
-        glTranslatef(self.position[0],self.position[1],0)
-        glScalef(self.size, self.size, 0)
-        glRotatef(self.angle,0,0,1)
-        glTranslatef(-self.v[0]/2, -self.v[1]/2, 0)
-
-        self.draw_vector()
-
-        glPopMatrix()
-        
-
-class VectorField():
-    def __init__(self, n_points=10, cell_size=None, x0=None, xf=None, y0=None, yf=None):
-        coordinates = [x0, xf, y0, yf]
-        if all(coordinates):
-            self.coordinates = ((x0,y0),(xf,yf))
-        else:
-            w = glutGet(GLUT_WINDOW_WIDTH)
-            h = glutGet(GLUT_WINDOW_HEIGHT)
-            self.coordinates = ((-w/2,-h/2),(w/2,h/2))
-
-        if n_points:
-            self.n_points = n_points
-        elif cell_size:
-            cell_size            
-        else:
-            raise Exception("Must pass n_points or cell size.")
-
-        self.grid_values = np.matrix((n_points, n_points))
-
-
+angulo_rot = 0
 def draw():
     global z, angulo_rot
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glPushMatrix()
+    x = np.sin(np.radians(angulo_rot))
+    y = np.cos(np.radians(angulo_rot))
+    # vec = Vector(1,1, size=500)
+    # vec = Vector(0,9, size=6)
+    
+    # V = VectorField(10, -600, -600, 600, 600)
+    V = VectorField(lambda x,y: 1, lambda x,y:1, 10)
+    # print(V.coordinates)
+    # Vector(angle=angulo_rot, size=1)
 
-    Vector(1,1).draw()
     # draw_axes(5,5,5)
+    # draw_axes(600,600,600)
     # draw_pontos(N_PONTOS, 800,-800,800,-800)
 
     # draw_grid(draw_vector, N_PONTOS, 5,-5,5,-5)
@@ -97,6 +39,8 @@ def draw():
 
     glPopMatrix()
     glutSwapBuffers() #Não sei o que faz
+
+    angulo_rot += 2
 
 
 def vector(v,size):
@@ -196,8 +140,8 @@ glEnable(GL_MULTISAMPLE)
 glEnable(GL_DEPTH_TEST)
 
 # gluPerspective(45,800.0/800.0,0.1,100.0)
-gluOrtho2D(-6,6,-6,6)
-# gluOrtho2D(-800,800,-800,800)
+# gluOrtho2D(-6,6,-6,6)
+gluOrtho2D(-800,800,-800,800)
 # glTranslatef(0.0,0.0,-20)
 glutTimerFunc(50,timer,1)
 glutMainLoop()
