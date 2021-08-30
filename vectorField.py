@@ -33,10 +33,10 @@ class VectorField():
         self.func_y = func_y
 
         if axes:
-            self._plot_axes()
+            self._draw_axes()
 
         self.draw()
-
+        # self._draw_points()
 
     def _update_field(self):
         xi, yi = np.meshgrid(
@@ -47,19 +47,37 @@ class VectorField():
         x = self.func_x(xi[::-1], yi)
         y = self.func_y(xi[::-1], yi)
 
-        return np.dstack((x,y))
+        return np.dstack((x,y)) 
     
     def draw(self):
         # self.grid_values = self._update_field()      
         (x0, y0), _ = self.coordinates
 
-        for j, array in enumerate(self.grid_values):
-            for i, vector in enumerate(array):
-                pos = (x0 + (self.dx * i), y0 + (self.dy * j))
+        for i, array in enumerate(self.grid_values):
+            for j, vector in enumerate(array):
+                offset = np.array([self.dx/2, self.dy/2])
+                cell_pos = np.array([x0 + (self.dx * j), y0 + (self.dy * i)])
+                pos = cell_pos + offset
                 # print(vector, pos)
-                Vector(1,1,position=pos, size=100)
+                Vector(1,0,position=pos, size=self.dx - 15)
+                # Vector(vector[0],vector[1],position=pos, size=self.dx - 15)
 
-    def _plot_axes(self):
+    def _draw_points(self):
+        # self.grid_values = self._update_field()      
+        (x0, y0), _ = self.coordinates
+
+        for i, array in enumerate(self.grid_values):
+            for j, vector in enumerate(array):
+                pos = (x0 + (self.dx * j), y0 + (self.dy * i))
+                # print(vector, pos)
+                
+                glBegin(GL_POINTS)
+                glVertex3f(pos[0],pos[1],0)
+                glEnd()
+                # Vector(1,0,position=pos, size=self.dx - 15)
+    
+    
+    def _draw_axes(self):
         (x0, y0), (xf, yf) = self.coordinates
 
         x_mid = ((xf-x0)/2) + x0

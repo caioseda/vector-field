@@ -11,22 +11,19 @@ HEIGHT = 1080
 CELL_SIZE = 20
 
 z = -2
-angulo_rot = 0
-
-
-angulo_rot = 0
+angulo_rot = 1
 def draw():
+    
     global z, angulo_rot
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glPushMatrix()
-    x = np.sin(np.radians(angulo_rot))
-    y = np.cos(np.radians(angulo_rot))
-    # vec = Vector(1,1, size=500)
+
+    # vec = Vector(1,1, size=100)
     # vec = Vector(0,9, size=6)
     
     # V = VectorField(10, -600, -600, 600, 600)
-    V = VectorField(lambda x,y: 1, lambda x,y:1, 10)
+    V = VectorField(lambda x,y: x+y, lambda x,y:x+y, 21)
     # print(V.coordinates)
     # Vector(angle=angulo_rot, size=1)
 

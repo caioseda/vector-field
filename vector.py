@@ -7,11 +7,7 @@ class Vector():
     def __init__(self, x=None, y=None, position=(0,0), angle=None, size=1):
         
         self.v = np.array([1,0])
-        
-        if position:
-            self.position = np.array(position)
-        else:
-            self.position = np.array([0,0])
+        self.position = np.array(position)
         
         if x != None and y != None:
             self.angle = self._get_angle(x,y)
