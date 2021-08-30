@@ -5,7 +5,7 @@ import numpy as np
 from vector import Vector
 
 class VectorField():
-    def __init__(self, func_x , func_y,  n_points=10, x0=None, y0=None, xf=None, yf=None, axes=True, points=True, square=True):
+    def __init__(self, func_x , func_y,  n_points=10, x0=None, y0=None, xf=None, yf=None, axes=True, points=False, vectors=True):
         # Canvas
         coordinates = [x0, xf, y0, yf]
         if all(coordinates):
@@ -27,30 +27,44 @@ class VectorField():
             raise Exception("Must pass n_points or cell size.")
 
         # Grid
-        self.grid_values = np.zeros((n_points, n_points))
+        self.grid_values = np.zeros((n_points, n_points, 2))
 
         self.func_x = func_x
         self.func_y = func_y
 
+        self._update_field()
+
         if axes:
             self._draw_axes()
-
-        self.draw()
+        if vectors:
+            self._draw_vectors()
+        if points:
+            self._draw_points()
         # self._draw_points()
 
     def _update_field(self):
-        xi, yi = np.meshgrid(
-            np.arange(-self.n_points/2, (self.n_points/2)+1),
-            np.arange(-self.n_points/2, (self.n_points/2)+1),
-            indexing='ij')
-        
-        x = self.func_x(xi[::-1], yi)
-        y = self.func_y(xi[::-1], yi)
+        # xi, yi = np.meshgrid(
+        #     np.arange((-self.n_points//2)+1, self.n_points//2),
+        #     np.arange((-self.n_points//2)+1, self.n_points//2),
+        #     indexing='ij')
 
-        return np.dstack((x,y)) 
+        # # x = self.func_x(xi[::-1], yi)
+        # # y = self.func_y(xi[::-1], yi)
+        # coord = np.dstack((xi[::-1],yi))
+
+        for i, array in enumerate(self.grid_values):
+            for j, vector in enumerate(array):
+                x = j - (self.n_points//2)
+                y = i - (self.n_points//2) 
+                
+                new_x = self.func_x(x, y)
+                new_y = self.func_y(x, y) 
+                self.grid_values[i][j] = np.array([new_x, new_y])
+
+        
+        return  
     
-    def draw(self):
-        # self.grid_values = self._update_field()      
+    def _draw_vectors(self):      
         (x0, y0), _ = self.coordinates
 
         for i, array in enumerate(self.grid_values):
@@ -58,20 +72,20 @@ class VectorField():
                 offset = np.array([self.dx/2, self.dy/2])
                 cell_pos = np.array([x0 + (self.dx * j), y0 + (self.dy * i)])
                 pos = cell_pos + offset
-                # print(vector, pos)
-                Vector(1,0,position=pos, size=self.dx - 15)
-                # Vector(vector[0],vector[1],position=pos, size=self.dx - 15)
+                vector = self.grid_values[i][j]
+                Vector(*vector,position=pos, size=self.dx *.8)
 
     def _draw_points(self):
-        # self.grid_values = self._update_field()      
         (x0, y0), _ = self.coordinates
 
         for i, array in enumerate(self.grid_values):
             for j, vector in enumerate(array):
-                pos = (x0 + (self.dx * j), y0 + (self.dy * i))
-                # print(vector, pos)
+                offset = np.array([self.dx/2, self.dy/2])
+                cell_pos = np.array([x0 + (self.dx * j), y0 + (self.dy * i)])
+                pos = cell_pos + offset
                 
                 glBegin(GL_POINTS)
+                glColor3fv((255,255,255))
                 glVertex3f(pos[0],pos[1],0)
                 glEnd()
                 # Vector(1,0,position=pos, size=self.dx - 15)
@@ -79,7 +93,7 @@ class VectorField():
     
     def _draw_axes(self):
         (x0, y0), (xf, yf) = self.coordinates
-
+    
         x_mid = ((xf-x0)/2) + x0
         y_mid = ((yf-y0)/2) + y0
 
@@ -97,3 +111,14 @@ class VectorField():
         for i in range(len(axes_points)):
             glVertex3fv(axes_points[i])
         glEnd()
+    
+    def get_vector_from_pos(self, x, y):
+        (x0, y0), (xf, yf) = self.coordinates
+        
+        if (x > x0 and x < xf) and (y > y0 and y < yf):
+            i = int(np.ceil(y /self.dy))
+            j = int(np.ceil(x /self.dx))
+
+            return self.grid_values[i][j]
+        else:
+            return None
