@@ -23,18 +23,18 @@ def draw():
     # vec = Vector(2,-9, size=200)
     
     # V = VectorField(10, -600, -600, 600, 600)
-    func_x = lambda x,y: x**2 - y**2 - 64
-    func_y = lambda x,y: 2*x*y
+    # func_x = lambda x,y: x**2 - y**2 - 64
+    # func_y = lambda x,y: 2*x*y
     # V = VectorField(func_x, func_y, 51,vectors=True)
     
     # c) Vx(x,y)=4cos(y / 3 + p / 4); Vy(x,y)=4sin(x / 3 + p / 4)
 
-    # func_x = lambda x,y: 4 * np.cos((y/3)+(x/4))
-    # func_y = lambda x,y: 4 * np.sin((x/3)+(y/4))
+    func_x = lambda x,y: 4 * np.cos((y/3)+(x/4))
+    func_y = lambda x,y: 4 * np.sin((x/3)+(y/4))
     V = VectorField(func_x, func_y, 25 ,vectors=True, norm=False)
     # V pip l VectorField(lambda x, y: x, lambda x, y: -y, 31,vectors=True)
     glPopMatrix()
-
+    
     glutSwapBuffers() #Não sei o que faz
 
     angulo_rot += 2
