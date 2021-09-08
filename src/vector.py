@@ -4,7 +4,7 @@ from OpenGL.GL import *
 import numpy as np
 
 class Vector():
-    def __init__(self, x=None, y=None, position=(0,0), angle=None, size=1):
+    def __init__(self, x=None, y=None, position=(0,0), angle=None, size=1, draw=True, color=(255,255,255)):
         
         self.v = np.array([1,0])
         self.position = np.array(position)
@@ -19,8 +19,9 @@ class Vector():
             raise Exception('You must pass x and y, or, angle and size.')
 
         self.size = size
-
-        self.draw()
+        self.color = color
+        if draw:
+            self.draw()
    
     def _get_angle(self, x, y):
         return np.degrees(np.arctan2(y,x))
@@ -31,11 +32,12 @@ class Vector():
     def draw_vector(self):        
         glBegin(GL_LINES)
         glColor3f(255,255,255)
+        glColor3fv(self.color)
         glVertex3f(0,0,0)
         glVertex3f(self.v[0], self.v[1],0)
         glEnd()
 
-        arrow_head_x = self.v[0]* 0.85
+        arrow_head_x = self.v[0] - 0.20
         arrow_head_y = self.v[0] - arrow_head_x
 
         glBegin(GL_TRIANGLES)

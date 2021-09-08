@@ -13,35 +13,28 @@ CELL_SIZE = 20
 z = -2
 angulo_rot = 1
 
-def draw():
-    
+def draw(): 
     global z, angulo_rot
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+    
     glPushMatrix()
-
     # vec = Vector(1,1, size=100)
     # vec = Vector(2,-9, size=200)
     
     # V = VectorField(10, -600, -600, 600, 600)
-    func_x = lambda x,y: x**2 - y**2 - 100
+    func_x = lambda x,y: x**2 - y**2 - 64
     func_y = lambda x,y: 2*x*y
     # V = VectorField(func_x, func_y, 51,vectors=True)
+    
+    # c) Vx(x,y)=4cos(y / 3 + p / 4); Vy(x,y)=4sin(x / 3 + p / 4)
 
-    # Vx(x,y)=(-3x) / sqrt(x x + y y); Vy(x,y)=(-3y)/ sqrt(x x + y y);
-    # func_x = lambda x,y: -3*x /np.sqrt(x**2 + y**2)
-    # func_y = lambda x,y: -3*y /np.sqrt(x**2 + y**2)
-    # V = VectorField(func_x, func_y, 15,vectors=True)
-    
-    # c) Vx(x,y)=4cos(y / 3 + p / 4); Vy(x,y)=4sin(x / 3 + p / 4) 
-    func_x = lambda x,y: 4 * np.cos((y/3)+(x/4))
-    func_y = lambda x,y: 4 * np.sin((x/3)+(y/4))
-    V = VectorField(func_x, func_y, 20,vectors=True)
-    # V = VectorField(lambda x, y: x, lambda x, y: -y, 31,vectors=True)
-    
-    # curve(V, 1, 1, 50, 15)
-    
+    # func_x = lambda x,y: 4 * np.cos((y/3)+(x/4))
+    # func_y = lambda x,y: 4 * np.sin((x/3)+(y/4))
+    V = VectorField(func_x, func_y, 25 ,vectors=True, norm=False)
+    # V pip l VectorField(lambda x, y: x, lambda x, y: -y, 31,vectors=True)
     glPopMatrix()
+
     glutSwapBuffers() #Não sei o que faz
 
     angulo_rot += 2
@@ -49,15 +42,16 @@ def draw():
 def curve(V, x,y, step, num_steps):
     p = np.array([x,y])
 
-    glBegin(GL_LINES)
-    glColor3f(255,0,0)
+    glBegin(GL_LINE_STRIP)
+    glColor3f(0,255,0)
     glVertex3f(*p,0)
     for i in range(num_steps):
-        vector = V.get_vector_from_pos(x,y)
-        new_p = p + (vector * step)
-        if new_p is not None:
-            glVertex3f(*new_p,0)
-
+        vector = V.get_vector_from_pos(*p)
+        if vector is not None:
+            # print(i,"v",p, vector, step, vector * step, p + (vector * step))
+            p = p + (vector * step)
+            glVertex3f(*p,0)
+            
     glEnd()       
 
 
